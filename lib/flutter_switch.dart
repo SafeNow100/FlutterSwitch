@@ -42,19 +42,18 @@ class FlutterSwitch extends StatefulWidget {
     this.activeIcon,
     this.inactiveIcon,
     this.duration = const Duration(milliseconds: 200),
+    this.activeGradient,
+    this.inactiveGradient,
   })  : assert(
-            (toggleColor == null || activeToggleColor == null) &&
-                (toggleColor == null || inactiveToggleColor == null),
+            (toggleColor == null || activeToggleColor == null) && (toggleColor == null || inactiveToggleColor == null),
             'Cannot provide toggleColor when an activeToggleColor or inactiveToggleColor was given\n'
             'To give the toggle a color, use "activeToggleColor: color" and "inactiveToggleColor: color".'),
         assert(
-            (switchBorder == null || activeSwitchBorder == null) &&
-                (switchBorder == null || inactiveSwitchBorder == null),
+            (switchBorder == null || activeSwitchBorder == null) && (switchBorder == null || inactiveSwitchBorder == null),
             'Cannot provide switchBorder when an activeSwitchBorder or inactiveSwitchBorder was given\n'
             'To give the switch a border, use "activeSwitchBorder: border" or "inactiveSwitchBorder: border".'),
         assert(
-            (toggleBorder == null || activeToggleBorder == null) &&
-                (toggleBorder == null || inactiveToggleBorder == null),
+            (toggleBorder == null || activeToggleBorder == null) && (toggleBorder == null || inactiveToggleBorder == null),
             'Cannot provide toggleBorder when an activeToggleBorder or inactiveToggleBorder was given\n'
             'To give the toggle a border, use "activeToggleBorder: color" or "inactiveToggleBorder: color".'),
         super(key: key);
@@ -124,6 +123,14 @@ class FlutterSwitch extends StatefulWidget {
   ///
   /// Defaults to [Colors.grey].
   final Color inactiveColor;
+
+  /// The color to use on the switch when the switch is on.
+  ///
+  final Gradient activeGradient;
+
+  /// The color to use on the switch when the switch is off.
+  ///
+  final Gradient inactiveGradient;
 
   /// The color to use on the text value when the switch is on.
   /// This parameter is only necessary when [showOnOff] property is true.
@@ -236,12 +243,12 @@ class FlutterSwitch extends StatefulWidget {
   /// The icon inside the toggle when the given value is true.
   ///
   /// This property is optional.
-  final Icon activeIcon;
+  final Widget activeIcon;
 
   /// The icon inside the toggle when the given value is false.
   ///
   /// This property is optional.
-  final Icon inactiveIcon;
+  final Widget inactiveIcon;
 
   /// The duration in milliseconds to change the state of the switch
   ///
@@ -252,8 +259,7 @@ class FlutterSwitch extends StatefulWidget {
   _FlutterSwitchState createState() => _FlutterSwitchState();
 }
 
-class _FlutterSwitchState extends State<FlutterSwitch>
-    with SingleTickerProviderStateMixin {
+class _FlutterSwitchState extends State<FlutterSwitch> with SingleTickerProviderStateMixin {
   Animation _toggleAnimation;
   AnimationController _animationController;
 
@@ -298,17 +304,20 @@ class _FlutterSwitchState extends State<FlutterSwitch>
   Widget build(BuildContext context) {
     Color _toggleColor = Colors.white;
     Color _switchColor = Colors.white;
+    Gradient _switchGradient;
     Border _switchBorder;
     Border _toggleBorder;
 
     if (widget.value) {
       _toggleColor = widget.activeToggleColor ?? widget.toggleColor;
       _switchColor = widget.activeColor;
+      _switchGradient = widget.activeGradient;
       _switchBorder = widget.activeSwitchBorder ?? widget.switchBorder;
       _toggleBorder = widget.activeToggleBorder ?? widget.toggleBorder;
     } else {
       _toggleColor = widget.inactiveToggleColor ?? widget.toggleColor;
       _switchColor = widget.inactiveColor;
+      _switchGradient = widget.inactiveGradient;
       _switchBorder = widget.inactiveSwitchBorder ?? widget.switchBorder;
       _toggleBorder = widget.inactiveToggleBorder ?? widget.toggleBorder;
     }
@@ -334,7 +343,8 @@ class _FlutterSwitchState extends State<FlutterSwitch>
               padding: EdgeInsets.all(widget.padding),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                color: _switchColor,
+                color: _switchGradient == null ? _switchColor : null,
+                gradient: _switchGradient,
                 border: _switchBorder,
               ),
               child: Stack(
@@ -405,13 +415,8 @@ class _FlutterSwitchState extends State<FlutterSwitch>
     );
   }
 
-  FontWeight get _activeTextFontWeight => widget.activeTextFontWeight != null
-      ? widget.activeTextFontWeight
-      : FontWeight.w900;
-  FontWeight get _inactiveTextFontWeight =>
-      widget.inactiveTextFontWeight != null
-          ? widget.inactiveTextFontWeight
-          : FontWeight.w900;
+  FontWeight get _activeTextFontWeight => widget.activeTextFontWeight != null ? widget.activeTextFontWeight : FontWeight.w900;
+  FontWeight get _inactiveTextFontWeight => widget.inactiveTextFontWeight != null ? widget.inactiveTextFontWeight : FontWeight.w900;
 
   Widget get _activeText {
     if (widget.showOnOff) {
