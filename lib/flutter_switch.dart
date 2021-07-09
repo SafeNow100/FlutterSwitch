@@ -12,14 +12,14 @@ class FlutterSwitch extends StatefulWidget {
   ///
 
   const FlutterSwitch({
-    Key key,
-    @required this.value,
-    @required this.onToggle,
+    Key? key,
+    required this.value,
+    required this.onToggle,
     this.activeColor = Colors.blue,
     this.inactiveColor = Colors.grey,
     this.activeTextColor = Colors.white70,
     this.inactiveTextColor = Colors.white70,
-    this.toggleColor,
+    this.toggleColor = Colors.white,
     this.activeToggleColor,
     this.inactiveToggleColor,
     this.width = 70.0,
@@ -44,11 +44,8 @@ class FlutterSwitch extends StatefulWidget {
     this.duration = const Duration(milliseconds: 200),
     this.activeGradient,
     this.inactiveGradient,
+    this.disabled = false,
   })  : assert(
-            (toggleColor == null || activeToggleColor == null) && (toggleColor == null || inactiveToggleColor == null),
-            'Cannot provide toggleColor when an activeToggleColor or inactiveToggleColor was given\n'
-            'To give the toggle a color, use "activeToggleColor: color" and "inactiveToggleColor: color".'),
-        assert(
             (switchBorder == null || activeSwitchBorder == null) && (switchBorder == null || inactiveSwitchBorder == null),
             'Cannot provide switchBorder when an activeSwitchBorder or inactiveSwitchBorder was given\n'
             'To give the switch a border, use "activeSwitchBorder: border" or "inactiveSwitchBorder: border".'),
@@ -101,7 +98,7 @@ class FlutterSwitch extends StatefulWidget {
   ///
   /// [activeTextColor] - The color to use on the text value when the switch is on.
   /// [activeTextFontWeight] - The font weight to use on the text value when the switch is on.
-  final String activeText;
+  final String? activeText;
 
   /// The text to display when the switch is off.
   /// This parameter is only necessary when [showOnOff] property is true.
@@ -112,7 +109,7 @@ class FlutterSwitch extends StatefulWidget {
   ///
   /// [inactiveTextColor] - The color to use on the text value when the switch is off.
   /// [inactiveTextFontWeight] - The font weight to use on the text value when the switch is off.
-  final String inactiveText;
+  final String? inactiveText;
 
   /// The color to use on the switch when the switch is on.
   ///
@@ -126,11 +123,11 @@ class FlutterSwitch extends StatefulWidget {
 
   /// The color to use on the switch when the switch is on.
   ///
-  final Gradient activeGradient;
+  final Gradient? activeGradient;
 
   /// The color to use on the switch when the switch is off.
   ///
-  final Gradient inactiveGradient;
+  final Gradient? inactiveGradient;
 
   /// The color to use on the text value when the switch is on.
   /// This parameter is only necessary when [showOnOff] property is true.
@@ -148,13 +145,13 @@ class FlutterSwitch extends StatefulWidget {
   /// This parameter is only necessary when [showOnOff] property is true.
   ///
   /// Defaults to [FontWeight.w900].
-  final FontWeight activeTextFontWeight;
+  final FontWeight? activeTextFontWeight;
 
   /// The font weight to use on the text value when the switch is off.
   /// This parameter is only necessary when [showOnOff] property is true.
   ///
   /// Defaults to [FontWeight.w900].
-  final FontWeight inactiveTextFontWeight;
+  final FontWeight? inactiveTextFontWeight;
 
   /// The color to use on the toggle of the switch.
   ///
@@ -167,13 +164,13 @@ class FlutterSwitch extends StatefulWidget {
   ///
   /// If [inactiveToggleColor] is used and this property is null. the value of
   /// [Colors.white] will be used.
-  final Color activeToggleColor;
+  final Color? activeToggleColor;
 
   /// The color to use on the toggle of the switch when the given value is false.
   ///
   /// If [activeToggleColor] is used and this property is null. the value of
   /// [Colors.white] will be used.
-  final Color inactiveToggleColor;
+  final Color? inactiveToggleColor;
 
   /// The given width of the switch.
   ///
@@ -211,57 +208,64 @@ class FlutterSwitch extends StatefulWidget {
   /// This property will give a uniform border to both states of the toggle
   ///
   /// If the [activeSwitchBorder] or [inactiveSwitchBorder] is used, this property must be null.
-  final BoxBorder switchBorder;
+  final BoxBorder? switchBorder;
 
   /// The border of the switch when the given value is true.
   ///
   /// This property is optional.
-  final BoxBorder activeSwitchBorder;
+  final BoxBorder? activeSwitchBorder;
 
   /// The border of the switch when the given value is false.
   ///
   /// This property is optional.
-  final BoxBorder inactiveSwitchBorder;
+  final BoxBorder? inactiveSwitchBorder;
 
   /// The border of the toggle.
   ///
   /// This property will give a uniform border to both states of the toggle
   ///
   /// If the [activeToggleBorder] or [inactiveToggleBorder] is used, this property must be null.
-  final BoxBorder toggleBorder;
+  final BoxBorder? toggleBorder;
 
   /// The border of the toggle when the given value is true.
   ///
   /// This property is optional.
-  final BoxBorder activeToggleBorder;
+  final BoxBorder? activeToggleBorder;
 
   /// The border of the toggle when the given value is false.
   ///
   /// This property is optional.
-  final BoxBorder inactiveToggleBorder;
+  final BoxBorder? inactiveToggleBorder;
 
   /// The icon inside the toggle when the given value is true.
+  /// activeIcon can be an Icon Widget, an Image or Fontawesome Icons.
   ///
   /// This property is optional.
-  final Widget activeIcon;
+  final Widget? activeIcon;
 
   /// The icon inside the toggle when the given value is false.
+  /// inactiveIcon can be an Icon Widget, an Image or Fontawesome Icons.
   ///
   /// This property is optional.
-  final Widget inactiveIcon;
+  final Widget? inactiveIcon;
 
   /// The duration in milliseconds to change the state of the switch
   ///
   /// Defaults to the value of 200 milliseconds.
   final Duration duration;
 
+  /// Determines whether the switch is disabled.
+  ///
+  /// Defaults to the value of false.
+  final bool disabled;
+
   @override
   _FlutterSwitchState createState() => _FlutterSwitchState();
 }
 
 class _FlutterSwitchState extends State<FlutterSwitch> with SingleTickerProviderStateMixin {
-  Animation _toggleAnimation;
-  AnimationController _animationController;
+  late final Animation _toggleAnimation;
+  late final AnimationController _animationController;
 
   @override
   void initState() {
@@ -304,22 +308,22 @@ class _FlutterSwitchState extends State<FlutterSwitch> with SingleTickerProvider
   Widget build(BuildContext context) {
     Color _toggleColor = Colors.white;
     Color _switchColor = Colors.white;
-    Gradient _switchGradient;
-    Border _switchBorder;
-    Border _toggleBorder;
+    Gradient? _switchGradient;
+    Border? _switchBorder;
+    Border? _toggleBorder;
 
     if (widget.value) {
       _toggleColor = widget.activeToggleColor ?? widget.toggleColor;
       _switchColor = widget.activeColor;
       _switchGradient = widget.activeGradient;
-      _switchBorder = widget.activeSwitchBorder ?? widget.switchBorder;
-      _toggleBorder = widget.activeToggleBorder ?? widget.toggleBorder;
+      _switchBorder = widget.activeSwitchBorder as Border? ?? widget.switchBorder as Border?;
+      _toggleBorder = widget.activeToggleBorder as Border? ?? widget.toggleBorder as Border?;
     } else {
       _toggleColor = widget.inactiveToggleColor ?? widget.toggleColor;
       _switchColor = widget.inactiveColor;
       _switchGradient = widget.inactiveGradient;
-      _switchBorder = widget.inactiveSwitchBorder ?? widget.switchBorder;
-      _toggleBorder = widget.inactiveToggleBorder ?? widget.toggleBorder;
+      _switchBorder = widget.inactiveSwitchBorder as Border? ?? widget.switchBorder as Border?;
+      _toggleBorder = widget.inactiveToggleBorder as Border? ?? widget.toggleBorder as Border?;
     }
 
     double _textSpace = widget.width - widget.toggleSize;
@@ -327,86 +331,98 @@ class _FlutterSwitchState extends State<FlutterSwitch> with SingleTickerProvider
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        return Align(
-          child: GestureDetector(
-            onTap: () {
-              if (widget.value)
-                _animationController.forward();
-              else
-                _animationController.reverse();
+        return Container(
+          width: widget.width,
+          child: Align(
+            child: GestureDetector(
+              onTap: () {
+                if (!widget.disabled) {
+                  if (widget.value)
+                    _animationController.forward();
+                  else
+                    _animationController.reverse();
 
-              widget.onToggle(!widget.value);
-            },
-            child: Container(
-              width: widget.width,
-              height: widget.height,
-              padding: EdgeInsets.all(widget.padding),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                color: _switchGradient == null ? _switchColor : null,
-                gradient: _switchGradient,
-                border: _switchBorder,
-              ),
-              child: Stack(
-                children: <Widget>[
-                  AnimatedOpacity(
-                    opacity: widget.value ? 1.0 : 0.0,
-                    duration: widget.duration,
-                    child: Container(
-                      width: _textSpace,
-                      padding: EdgeInsets.symmetric(horizontal: 4.0),
-                      alignment: Alignment.centerLeft,
-                      child: _activeText,
-                    ),
+                  widget.onToggle(!widget.value);
+                }
+              },
+              child: Opacity(
+                opacity: widget.disabled ? 0.6 : 1,
+                child: Container(
+                  width: widget.width,
+                  height: widget.height,
+                  padding: EdgeInsets.all(widget.padding),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(widget.borderRadius),
+                    color: _switchGradient == null ? _switchColor : null,
+                    gradient: _switchGradient,
+                    border: _switchBorder,
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: AnimatedOpacity(
-                      opacity: !widget.value ? 1.0 : 0.0,
-                      duration: widget.duration,
-                      child: Container(
-                        width: _textSpace,
-                        padding: EdgeInsets.symmetric(horizontal: 4.0),
-                        alignment: Alignment.centerRight,
-                        child: _inactiveText,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: Align(
-                      alignment: _toggleAnimation.value,
-                      child: Container(
-                        width: widget.toggleSize,
-                        height: widget.toggleSize,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _toggleColor ?? Colors.white,
-                          border: _toggleBorder,
-                        ),
+                  child: Stack(
+                    children: <Widget>[
+                      AnimatedOpacity(
+                        opacity: widget.value ? 1.0 : 0.0,
+                        duration: widget.duration,
                         child: Container(
-                          child: Stack(
-                            children: [
-                              Center(
-                                child: AnimatedOpacity(
-                                  opacity: widget.value ? 1.0 : 0.0,
-                                  duration: widget.duration,
-                                  child: widget.activeIcon,
-                                ),
-                              ),
-                              Center(
-                                child: AnimatedOpacity(
-                                  opacity: !widget.value ? 1.0 : 0.0,
-                                  duration: widget.duration,
-                                  child: widget.inactiveIcon,
-                                ),
-                              ),
-                            ],
+                          width: _textSpace,
+                          padding: EdgeInsets.symmetric(horizontal: 4.0),
+                          alignment: Alignment.centerLeft,
+                          child: _activeText,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: AnimatedOpacity(
+                          opacity: !widget.value ? 1.0 : 0.0,
+                          duration: widget.duration,
+                          child: Container(
+                            width: _textSpace,
+                            padding: EdgeInsets.symmetric(horizontal: 4.0),
+                            alignment: Alignment.centerRight,
+                            child: _inactiveText,
                           ),
                         ),
                       ),
-                    ),
+                      Container(
+                        child: Align(
+                          alignment: _toggleAnimation.value,
+                          child: Container(
+                            width: widget.toggleSize,
+                            height: widget.toggleSize,
+                            padding: EdgeInsets.all(4.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _toggleColor,
+                              border: _toggleBorder,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Container(
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: AnimatedOpacity(
+                                        opacity: widget.value ? 1.0 : 0.0,
+                                        duration: widget.duration,
+                                        child: widget.activeIcon,
+                                      ),
+                                    ),
+                                    Center(
+                                      child: AnimatedOpacity(
+                                        opacity: !widget.value ? 1.0 : 0.0,
+                                        duration: widget.duration,
+                                        child: widget.inactiveIcon,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -415,13 +431,13 @@ class _FlutterSwitchState extends State<FlutterSwitch> with SingleTickerProvider
     );
   }
 
-  FontWeight get _activeTextFontWeight => widget.activeTextFontWeight != null ? widget.activeTextFontWeight : FontWeight.w900;
-  FontWeight get _inactiveTextFontWeight => widget.inactiveTextFontWeight != null ? widget.inactiveTextFontWeight : FontWeight.w900;
+  FontWeight get _activeTextFontWeight => widget.activeTextFontWeight ?? FontWeight.w900;
+  FontWeight get _inactiveTextFontWeight => widget.inactiveTextFontWeight ?? FontWeight.w900;
 
   Widget get _activeText {
     if (widget.showOnOff) {
       return Text(
-        (widget?.activeText != null) ? widget.activeText : "On",
+        widget.activeText ?? "On",
         style: TextStyle(
           color: widget.activeTextColor,
           fontWeight: _activeTextFontWeight,
@@ -436,7 +452,7 @@ class _FlutterSwitchState extends State<FlutterSwitch> with SingleTickerProvider
   Widget get _inactiveText {
     if (widget.showOnOff) {
       return Text(
-        (widget?.inactiveText != null) ? widget.inactiveText : "Off",
+        widget.inactiveText ?? "Off",
         style: TextStyle(
           color: widget.inactiveTextColor,
           fontWeight: _inactiveTextFontWeight,
